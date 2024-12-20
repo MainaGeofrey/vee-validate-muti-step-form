@@ -1,0 +1,57 @@
+Payment Status Check API Documentation
+
+Overview
+
+The following two tables contain the information saved when an M-Pesa payment gateway transaction occurs:
+
+1. safaricom_mpesa_payments: Contains general payment details.
+2. safaricom_mpesa_c2b_transaction_logs: Contains detailed transaction logs for C2B payments.
+
+The two tables are related by the `transaction_token` column, so that each record in `safaricom_mpesa_payments` has associated records in `safaricom_mpesa_c2b_transaction_logs` that provide detailed information about the payment process.
+
+Workflow
+
+Each payment process starts with creating a payment intent, applicable for both STK (Auto Pay) and Paybill transactions. 
+The `transaction_token` uniquely identifies every payment. The following are the expected transaction logs for each type of payment:
+
+- Paybill:
+  - Two transaction logs in safaricom_mpesa_c2b_transaction_logs:
+    1. Validation request.
+    2. Confirmation request.
+
+- STK:
+  - Three transaction logs in safaricom_mpesa_c2b_transaction_logs:
+    1. Validation request.
+    2. Confirmation request.
+    3. Callback request.
+
+The confirmation and callback logs provide critical details about the transaction's outcome.
+
+Database Schema References
+
+safaricom_mpesa_payments
+
+Column               Description                                                             
+transaction_token    Unique token for the payment.                                           
+amount               Payment amount.                                                         
+currency_rate        Conversion rate for the payment currency.                               
+phone_number         Phone number initiating the payment.                                    
+transaction_type     Type of transaction (stk, paybill).                                     
+status               Current payment status (pending, completed, failed, cancelled).         
+
+safaricom_mpesa_c2b_transaction_logs
+
+Column                Description                              
+charge_description    Description of the payment charge.       
+description           Detailed payment description.            
+merchant_request_id   Merchant request identifier.             
+checkout_request_id   Checkout request identifier.             
+result_code           Result code of the transaction.          
+result_desc           Description of the result.               
+response_code         Response code from Safaricom.            
+response_description  Description of the response.             
+customer_message      Message to the customer.                 
+mpesa_receipt_number  Unique receipt number from M-Pesa.       
+transaction_date      Date and time of the transaction.        
+transaction_type      Transaction type (stk, paybill).         
+business_short_code   The business short code used for payment.
